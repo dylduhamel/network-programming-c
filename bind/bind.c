@@ -26,8 +26,11 @@ int main(int argc, char *argv[])
   /* Make a socket */
   sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 
-  /* Bind socket to the port on host machine */
-  if ((status_bind = bind(sockfd, res->ai_addr, res->ai_addrlen)) != 0)
+  if ((status_bind = bind(sockfd, res->ai_addr, res->ai_addrlen)) == 0)
+  {
+    printf("Successfully bound to port\n");
+  }
+  else
   {
     fprintf(stderr, "bind: %s\n", gai_strerror(status_bind));
     return 2;
