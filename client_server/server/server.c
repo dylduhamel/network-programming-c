@@ -23,6 +23,7 @@
 
 #define BACKLOG 10 /* Number of pending connections in queue */
 
+/* Signal handler function for sigaction sa_handler */
 void sigchld_handler(int s)
 {
   /* waitpid() might overwrite errno, so we save and restore it */
@@ -54,7 +55,7 @@ int main(void)
   struct addrinfo hints, *servinfo, *p;
   struct sockaddr_storage their_addr; /* Address info of connection */
   socklen_t sin_size;
-  struct sigaction sa;
+  struct sigaction act;
   int yes = 1;
   char s[INET6_ADDRSTRLEN]; /* Hold the IP address in after ntop is called */
   int rv;
@@ -107,5 +108,52 @@ int main(void)
     exit(1);
   }
 
-  if (listen)
+  if (listen(sockfd, BACKLOG) == -1)
+  {
+    perror("listen");
+    exit(1);
+  }
+
+  act.sa_handler = sigchld_handler;
+  sigemptyset(&act.sa_mask);
+  act.sa_flags = SA_RESTART;
+  if (sigaction(SIGCHLD, &act, NULL) == -1)
+  {
+    perror("sigaction");
+    exit(1);
+  }
+
+  printf("server: waiting for connections...\n");
+
+  /* Main accept loop */
+  while (1)
+  {
+    sin_size = sizeof(their_addr);
+    if ((newfd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size)) ==
+        -1)
+    {
+      perror("accept");
+      continue; /* Block until next incoming connection */
+    }
+
+    /* Convert from binary address to printable */
+    inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr),
+              s, sizeof(s));
+    printf("server: got connection from %s\n", s);
+
+    /* Create child process to send message */
+    if (!fork())
+    {
+      close(sockfd);
+      if (send(newfd, "Hello, World!", 13, 0) == -1)
+      {
+        perror("send");
+      }
+      close(newfd);
+      exit(0);
+    }
+    close(newfd); /* Parent closes newfd, msg sent */
+  }
+
+  return 0;
 }
