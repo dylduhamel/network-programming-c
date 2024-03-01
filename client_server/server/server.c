@@ -1,5 +1,5 @@
 /**
- * A simple stream socket server
+ * A simple stream socket server.
  *
  * Dylan Duhamel {duhadm19@alumni.wfu.edu}
  * Feb. 28, 2024
