@@ -1,4 +1,5 @@
 /*
+ * Dylan Duhamel
  * showip.c -- show IP address for a given host on the command line
  * */
 
