@@ -1,3 +1,7 @@
+/* Dylan Duhamel
+* duhadm19@alumni.wfu.edu
+*/
+
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
