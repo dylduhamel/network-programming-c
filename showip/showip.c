@@ -1,5 +1,6 @@
 /*
  * Dylan Duhamel
+ * duhadm19@alumni.wfu.edu
  * showip.c -- show IP address for a given host on the command line
  * */
 
